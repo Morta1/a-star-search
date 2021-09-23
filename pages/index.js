@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 class Node {
   gCost = 0;
@@ -23,7 +23,7 @@ const getRandomArbitrary = (min, max) => {
 
 const Home = () => {
   const [grid, setGrid] = useState([]);
-  const [gridSize] = useState({ x: 30, y: 10 });
+  const [gridSize] = useState({ x: 70, y: 30 });
   const [startPos, setStartPos] = useState();
   const [targetPos, setTargetPos] = useState();
   const [isClicked, setIsClicked] = useState(false);
@@ -42,7 +42,7 @@ const Home = () => {
       for (let i = 0; i < gridSize.x; i++) {
         tempGrid[i] = [];
         for (let j = 0; j < gridSize.y; j++) {
-          const isWalkable = Math.random(0, 1) < 0.7;
+          let isWalkable = Math.random() < 0.45;
           if (
             isSamePosition({ x: i, y: j }, sPos) ||
             isSamePosition({ x: i, y: j }, tPos)
@@ -82,7 +82,7 @@ const Home = () => {
         }
         console.log(tempGrid);
         setGrid(tempGrid);
-      }, 100 * i);
+      }, 20 * i);
     }
   };
 
@@ -128,7 +128,7 @@ const Home = () => {
     while (
       startNode?.parent?.position.x !== currentNode?.parent?.position.x &&
       startNode?.parent?.position.y !== currentNode?.parent?.position.y
-    ) {
+      ) {
       path = [...path, currentNode];
       currentNode = currentNode.parent;
     }
@@ -229,10 +229,14 @@ const Home = () => {
     <Wrapper>
       <h2>A* search</h2>
       <div className={"legend"}>
-        <div className='node start-node' />
+        <div className='node start-node'/>
         <span className={"title"}>Starting Node</span>
-        <div className='node target-node' />
+        <div className='node target-node'/>
         <span className={"title"}>Target Node</span>
+        <div className='node neighbour-node'/>
+        <span className={"title"}>Neighbour Node</span>
+        <div className='node walked-on-node'/>
+        <span className={"title"}>Walked On Node</span>
       </div>
       <div className='grid'>
         {grid?.map((rowArray, rowIndex) => {
@@ -240,41 +244,40 @@ const Home = () => {
             <div key={`row-${rowIndex}`}>
               {rowArray?.map((node, columnIndex) => {
                 return (
-                  <div
-                    onMouseUp={() => setIsClicked(false)}
-                    onMouseDown={() => onNodeClick(rowIndex, columnIndex)}
-                    onMouseEnter={() => {
-                      if (isClicked) {
-                        setTimeout(() => {
-                          onNodeClick(rowIndex, columnIndex);
-                        });
-                      }
-                    }}
-                    className={`node${
-                      rowIndex === startPos?.x && columnIndex === startPos?.y
-                        ? " start-node"
-                        : ""
-                    }${
-                      rowIndex === targetPos?.x && columnIndex === targetPos?.y
-                        ? " target-node"
-                        : ""
-                    }${
-                      node.neighbour &&
-                      !node.walkedOn &&
-                      !isSamePosition(
-                        { x: rowIndex, y: columnIndex },
-                        startPos
-                      ) &&
-                      !isSamePosition(
-                        { x: rowIndex, y: columnIndex },
-                        targetPos
-                      )
-                        ? " neighbour-node"
-                        : ""
-                    }${!node.walkable ? " unwalkable" : ""}
+                  <div onMouseUp={() => setIsClicked(false)}
+                       onMouseDown={() => onNodeClick(rowIndex, columnIndex)}
+                       onMouseEnter={() => {
+                         if (isClicked) {
+                           setTimeout(() => {
+                             onNodeClick(rowIndex, columnIndex);
+                           });
+                         }
+                       }}
+                       className={`node${
+                         rowIndex === startPos?.x && columnIndex === startPos?.y
+                           ? " start-node"
+                           : ""
+                       }${
+                         rowIndex === targetPos?.x && columnIndex === targetPos?.y
+                           ? " target-node"
+                           : ""
+                       }${
+                         node.neighbour &&
+                         !node.walkedOn &&
+                         !isSamePosition(
+                           { x: rowIndex, y: columnIndex },
+                           startPos
+                         ) &&
+                         !isSamePosition(
+                           { x: rowIndex, y: columnIndex },
+                           targetPos
+                         )
+                           ? " neighbour-node"
+                           : ""
+                       }${!node.walkable ? " unwalkable" : ""}
                     ${node.walkedOn ? " walked-on-node" : ""}
                     `}
-                    key={`column-${columnIndex}`}></div>
+                       key={`column-${columnIndex}`}/>
                 );
               })}
             </div>
